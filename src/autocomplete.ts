@@ -342,8 +342,8 @@ class AutoComplete {
         /**
          * Manage the cache
          */
-        _Cache: function(value: string): string|undefined {
-            return this.$Cache[value];
+        _Cache: function(key: string, value: string): string|undefined {
+            return this.$Cache["[" + key + "]" + value];
         },
 
         /**
@@ -641,7 +641,7 @@ class AutoComplete {
 
         request.onreadystatechange = function() {
             if (request.readyState == 4 && request.status == 200) {
-                params.$Cache[queryParams] = request.response;
+                params.$Cache["[" + params.Input.Id + "]" + queryParams] = request.response;
                 callback(request.response);
             }
             else if (request.status >= 400) {
@@ -670,7 +670,7 @@ class AutoComplete {
     }
 
     cache(params: Params, callback: any, callbackErr: any): void {
-        var response: string|undefined = params._Cache(params._Pre());
+        var response: string|undefined = params._Cache(params.Input.Id, params._Pre());
 
         if (response === undefined) {
             var request: XMLHttpRequest = AutoComplete.prototype.makeRequest(params, callback, callbackErr);
