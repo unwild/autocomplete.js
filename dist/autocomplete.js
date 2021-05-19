@@ -1,4 +1,3 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AutoComplete = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 /*
  * @license MIT
  *
@@ -43,7 +42,7 @@ var AutoComplete = /** @class */ (function () {
         }
         else {
             var specificParams = AutoComplete.merge(AutoComplete.defaults, params, {
-                DOMResults: document.createElement("div")
+                DOMResults: document.createElement("div"),
             });
             AutoComplete.prototype.create(specificParams, selector);
             return specificParams;
@@ -131,7 +130,7 @@ var AutoComplete = /** @class */ (function () {
         }
         request.onreadystatechange = function () {
             if (request.readyState == 4 && request.status == 200) {
-                params.$Cache[queryParams] = request.response;
+                params.$Cache["[" + params.Input.id + "]" + queryParams] = request.response;
                 callback(request.response);
             }
             else if (request.status >= 400) {
@@ -157,7 +156,7 @@ var AutoComplete = /** @class */ (function () {
         }
     };
     AutoComplete.prototype.cache = function (params, callback, callbackErr) {
-        var response = params._Cache(params._Pre());
+        var response = params._Cache(params.Input.id, params._Pre());
         if (response === undefined) {
             var request = AutoComplete.prototype.makeRequest(params, callback, callbackErr);
             AutoComplete.prototype.ajax(params, request);
@@ -203,9 +202,9 @@ var AutoComplete = /** @class */ (function () {
         KeyboardMappings: {
             "Enter": {
                 Conditions: [{
-                        Is: 13,
-                        Not: false
-                    }],
+                    Is: 13,
+                    Not: false
+                }],
                 Callback: function (event) {
                     if (this.DOMResults.getAttribute("class").indexOf("open") != -1) {
                         var liActive = this.DOMResults.querySelector("li.active");
@@ -221,13 +220,13 @@ var AutoComplete = /** @class */ (function () {
             },
             "KeyUpAndDown_down": {
                 Conditions: [{
-                        Is: 38,
-                        Not: false
-                    },
-                    {
-                        Is: 40,
-                        Not: false
-                    }],
+                    Is: 38,
+                    Not: false
+                },
+                {
+                    Is: 40,
+                    Not: false
+                }],
                 Callback: function (event) {
                     event.preventDefault();
                 },
@@ -236,13 +235,13 @@ var AutoComplete = /** @class */ (function () {
             },
             "KeyUpAndDown_up": {
                 Conditions: [{
-                        Is: 38,
-                        Not: false
-                    },
-                    {
-                        Is: 40,
-                        Not: false
-                    }],
+                    Is: 38,
+                    Not: false
+                },
+                {
+                    Is: 40,
+                    Not: false
+                }],
                 Callback: function (event) {
                     event.preventDefault();
                     var first = this.DOMResults.querySelector("li:first-child:not(.locked)"), last = this.DOMResults.querySelector("li:last-child:not(.locked)"), active = this.DOMResults.querySelector("li.active");
@@ -269,13 +268,13 @@ var AutoComplete = /** @class */ (function () {
             },
             "AlphaNum": {
                 Conditions: [{
-                        Is: 13,
-                        Not: true
-                    }, {
-                        From: 35,
-                        To: 40,
-                        Not: true
-                    }],
+                    Is: 13,
+                    Not: true
+                }, {
+                    From: 35,
+                    To: 40,
+                    Not: true
+                }],
                 Callback: function () {
                     var oldValue = this.Input.getAttribute("data-autocomplete-old-value"), currentValue = this._Pre();
                     if (currentValue !== "" && currentValue.length >= this._MinChars()) {
@@ -385,8 +384,8 @@ var AutoComplete = /** @class */ (function () {
         /**
          * Manage the cache
          */
-        _Cache: function (value) {
-            return this.$Cache[value];
+        _Cache: function (key, value) {
+            return this.$Cache["[" + key + "]" + value];
         },
         /**
          * Manage the open
@@ -405,6 +404,9 @@ var AutoComplete = /** @class */ (function () {
             Array.prototype.forEach.call(this.DOMResults.getElementsByTagName("li"), function (li) {
                 if (li.getAttribute("class") != "locked") {
                     li.onclick = function () {
+                        params._Select(li);
+                    };
+                    li.onmousedown = function () {
                         params._Select(li);
                     };
                 }
@@ -534,7 +536,3 @@ var AutoComplete = /** @class */ (function () {
     };
     return AutoComplete;
 }());
-module.exports = AutoComplete;
-
-},{}]},{},[1])(1)
-});
