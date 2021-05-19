@@ -367,6 +367,9 @@ class AutoComplete {
                     li.onclick = function() {
                         params._Select(li);
                     };
+                   li.onmousedown = function() {
+                        params._Select(li);
+                    };
                 }
             });
         },
